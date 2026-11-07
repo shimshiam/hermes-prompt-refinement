@@ -1,0 +1,19 @@
+{
+  "name": "hermes-prompt-refinement",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Prompt Refinement for Hermes Desktop: review a deeper version of your prompt before it is sent.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "vitest run",
+    "check:build": "node scripts/check-build.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "nanostores": "1.4.2",
+    "react": "19.3.0",
+    "vitest": "4.1.12"
+  }
+}

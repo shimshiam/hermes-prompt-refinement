@@ -1,0 +1,4 @@
+name: prompt-refinement
+version: 0.1.0
+description: "Prompt Refinement for Hermes Desktop: review a deeper version of your prompt before it is sent (Off, Approval-First, Automatic). This half adds a 'Prompt refinement' auxiliary model slot (Settings > Model > Auxiliary); it registers no tools or hooks."
+author: "shimshiam"
