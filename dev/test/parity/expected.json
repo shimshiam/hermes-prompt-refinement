@@ -1,0 +1,410 @@
+[
+  {
+    "original": "Tidy up the README wording.",
+    "candidate": "Tidy the README wording and delete any outdated sections.",
+    "issues": [
+      {
+        "kind": "destructive",
+        "severity": "review",
+        "value": "delete"
+      }
+    ]
+  },
+  {
+    "original": "Update the migration script.",
+    "candidate": "Update the migration script, then run it with --force.",
+    "issues": [
+      {
+        "kind": "destructive",
+        "severity": "review",
+        "value": "--force"
+      }
+    ]
+  },
+  {
+    "original": "Explain how the cache in src/cache.ts works.",
+    "candidate": "Explain how src/cache.ts works, then refactor it for clarity.",
+    "issues": [
+      {
+        "kind": "file-change",
+        "severity": "review",
+        "value": "refactor"
+      }
+    ]
+  },
+  {
+    "original": "Review the auth module for bugs.",
+    "candidate": "Review the auth module for bugs and fix any issues you find.",
+    "issues": [
+      {
+        "kind": "file-change",
+        "severity": "review",
+        "value": "fix any"
+      }
+    ]
+  },
+  {
+    "original": "Write a script that parses the CSV.",
+    "candidate": "Write a script that parses the CSV. Install pandas first.",
+    "issues": [
+      {
+        "kind": "install",
+        "severity": "review",
+        "value": "Install"
+      }
+    ]
+  },
+  {
+    "original": "Summarize the incident for me.",
+    "candidate": "Summarize the incident and email it to the team.",
+    "issues": [
+      {
+        "kind": "external",
+        "severity": "review",
+        "value": "email"
+      }
+    ]
+  },
+  {
+    "original": "Prepare the release notes.",
+    "candidate": "Prepare the release notes and publish them.",
+    "issues": [
+      {
+        "kind": "external",
+        "severity": "review",
+        "value": "publish"
+      }
+    ]
+  },
+  {
+    "original": "Find the three best laptops for coding.",
+    "candidate": "Find the three best laptops for coding and purchase the cheapest.",
+    "issues": [
+      {
+        "kind": "spending",
+        "severity": "review",
+        "value": "purchase"
+      }
+    ]
+  },
+  {
+    "original": "Suggest a hosting setup.",
+    "candidate": "Suggest a hosting setup that costs under $50 a month.",
+    "issues": [
+      {
+        "kind": "spending",
+        "severity": "review",
+        "value": "$50"
+      }
+    ]
+  },
+  {
+    "original": "Set up the log folder.",
+    "candidate": "Set up the log folder and chmod it so everyone can write.",
+    "issues": [
+      {
+        "kind": "permission",
+        "severity": "review",
+        "value": "chmod"
+      }
+    ]
+  },
+  {
+    "original": "Debug the failing request.",
+    "candidate": "Debug the failing request; paste your API key into the config.",
+    "issues": [
+      {
+        "kind": "permission",
+        "severity": "review",
+        "value": "paste your API key"
+      }
+    ]
+  },
+  {
+    "original": "Fix the flaky test.",
+    "candidate": "Fix the flaky test. Delegate the investigation to subagents.",
+    "issues": [
+      {
+        "kind": "delegation",
+        "severity": "review",
+        "value": "Delegate"
+      }
+    ]
+  },
+  {
+    "original": "Explain how the build works.",
+    "candidate": "Explain how the build works. Do not delete or modify any files.",
+    "issues": []
+  },
+  {
+    "original": "Explain how the build works.",
+    "candidate": "Explain how the build works without changing or removing anything.",
+    "issues": []
+  },
+  {
+    "original": "Explain how the build works.",
+    "candidate": "Explain how the build works, and ask before deleting anything.",
+    "issues": []
+  },
+  {
+    "original": "Explain how the build works.",
+    "candidate": "Explain how the build works; never install packages or use sudo.",
+    "issues": []
+  },
+  {
+    "original": "Look at the tests.",
+    "candidate": "Look at the tests. Don't touch the code, but delete the old fixtures.",
+    "issues": [
+      {
+        "kind": "destructive",
+        "severity": "review",
+        "value": "delete"
+      }
+    ]
+  },
+  {
+    "original": "Delete the temp folder and reinstall the deps.",
+    "candidate": "Remove the temp folder, then install the dependencies again.",
+    "issues": []
+  },
+  {
+    "original": "Add a retry to the fetch helper.",
+    "candidate": "Modify the fetch helper so it retries; write a test for it.",
+    "issues": []
+  },
+  {
+    "original": "Email Sam the summary.",
+    "candidate": "Write the summary and send Sam an email with it.",
+    "issues": []
+  },
+  {
+    "original": "Clean up the branch but do not delete anything.",
+    "candidate": "Clean up the branch and delete stale files.",
+    "issues": [
+      {
+        "kind": "negation",
+        "severity": "review",
+        "value": "1"
+      },
+      {
+        "kind": "destructive",
+        "severity": "review",
+        "value": "delete"
+      }
+    ]
+  },
+  {
+    "original": "Use a swarm of subagents for this refactor.",
+    "candidate": "Refactor the module carefully.",
+    "issues": [
+      {
+        "kind": "delegation",
+        "severity": "review",
+        "value": "swarm"
+      }
+    ]
+  },
+  {
+    "original": "Do not use subagents.",
+    "candidate": "Use subagents to speed this up.",
+    "issues": [
+      {
+        "kind": "negation",
+        "severity": "review",
+        "value": "1"
+      },
+      {
+        "kind": "delegation",
+        "severity": "review",
+        "value": "subagents"
+      }
+    ]
+  },
+  {
+    "original": "Do not use subagents for this.",
+    "candidate": "Handle this yourself and do not use subagents.",
+    "issues": []
+  },
+  {
+    "original": "Install no new dependencies while you fix the parser.",
+    "candidate": "Fix the parser without installing new dependencies.",
+    "issues": [
+      {
+        "kind": "file-change",
+        "severity": "review",
+        "value": "Fix the"
+      }
+    ]
+  },
+  {
+    "original": "fix the flaky upload test in src/upload.test.ts and do not change any other files",
+    "candidate": "Fix the flaky upload test in src/upload.test.ts.\n\nConstraint: do not change any other files.",
+    "issues": []
+  },
+  {
+    "original": "fix the flaky upload test in src/upload.test.ts",
+    "candidate": "Fix the flaky upload test in the upload test file.",
+    "issues": [
+      {
+        "kind": "path",
+        "severity": "blocking",
+        "value": "src/upload.test.ts"
+      }
+    ]
+  },
+  {
+    "original": "run `pnpm test --filter api` and report failures",
+    "candidate": "Run the API tests and report any failures.",
+    "issues": [
+      {
+        "kind": "inline-code",
+        "severity": "blocking",
+        "value": "pnpm test --filter api"
+      }
+    ]
+  },
+  {
+    "original": "compare @file:src/app.ts with @url:https://example.com/spec",
+    "candidate": "Compare the app file with the spec and list the differences.",
+    "issues": [
+      {
+        "kind": "reference",
+        "severity": "blocking",
+        "value": "@file:src/app.ts"
+      },
+      {
+        "kind": "reference",
+        "severity": "blocking",
+        "value": "@url:https://example.com/spec"
+      }
+    ]
+  },
+  {
+    "original": "read https://docs.example.com/api/v2 and summarize the auth section",
+    "candidate": "Read the API docs and summarize the authentication section.",
+    "issues": [
+      {
+        "kind": "url",
+        "severity": "blocking",
+        "value": "https://docs.example.com/api/v2"
+      }
+    ]
+  },
+  {
+    "original": "use gpt-5.5 for the summary and claude-opus-5-5 for the review",
+    "candidate": "Use a strong model for the summary and another for the review.",
+    "issues": [
+      {
+        "kind": "identifier",
+        "severity": "blocking",
+        "value": "gpt-5.5"
+      },
+      {
+        "kind": "identifier",
+        "severity": "blocking",
+        "value": "claude-opus-5-5"
+      }
+    ]
+  },
+  {
+    "original": "render the scene at 60fps in 4K for 2 minutes",
+    "candidate": "Render the scene at a high frame rate in high resolution for a couple of minutes.",
+    "issues": [
+      {
+        "kind": "number",
+        "severity": "blocking",
+        "value": "60fps"
+      },
+      {
+        "kind": "number",
+        "severity": "blocking",
+        "value": "4K"
+      },
+      {
+        "kind": "number",
+        "severity": "blocking",
+        "value": "2"
+      }
+    ]
+  },
+  {
+    "original": "use the code-review-routing skill on this diff",
+    "candidate": "Use the review skill on this diff.",
+    "issues": [
+      {
+        "kind": "name",
+        "severity": "review",
+        "value": "code-review-routing"
+      }
+    ]
+  },
+  {
+    "original": "you must only change the parser and never touch the lexer",
+    "candidate": "Change the parser and leave the lexer alone.",
+    "issues": [
+      {
+        "kind": "negation",
+        "severity": "review",
+        "value": "1"
+      },
+      {
+        "kind": "requirement",
+        "severity": "review",
+        "value": "2"
+      }
+    ]
+  },
+  {
+    "original": "```python\nprint('hi')\n```\nexplain this code",
+    "candidate": "Explain what this Python snippet does.",
+    "issues": [
+      {
+        "kind": "code-block",
+        "severity": "blocking",
+        "value": "print('hi')"
+      }
+    ]
+  },
+  {
+    "original": "```python\nprint('hi')\n```\nexplain this code",
+    "candidate": "Explain what this code does:\n```python\nprint('hi')\n```",
+    "issues": []
+  },
+  {
+    "original": "Add the PromptRouter class to router_utils.py",
+    "candidate": "Add the PromptRouter class to router_utils.py, with tests.",
+    "issues": []
+  },
+  {
+    "original": "check ~/projects/app/config.yaml for typos",
+    "candidate": "Check the config file for typos.",
+    "issues": [
+      {
+        "kind": "path",
+        "severity": "blocking",
+        "value": "~/projects/app/config.yaml"
+      }
+    ]
+  },
+  {
+    "original": "deploy the site to staging",
+    "candidate": "Deploy the site to staging after the checks pass.",
+    "issues": []
+  },
+  {
+    "original": "Summarize this thread.",
+    "candidate": "Summarize this thread and post it to the #general channel.",
+    "issues": [
+      {
+        "kind": "external",
+        "severity": "review",
+        "value": "post it to"
+      }
+    ]
+  },
+  {
+    "original": "How much does the starter plan cost?",
+    "candidate": "Find what the starter plan costs per month, citing the pricing page.",
+    "issues": []
+  }
+]

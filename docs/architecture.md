@@ -147,13 +147,39 @@ custom guidance, chat excerpt) plus the owner connection and profile, and with
 profiles, connections, models or chat excerpts. Lighter depths get a tighter
 output budget.
 
+## The /refine-prompt fallback (any Hermes)
+
+The Python half also registers `/refine-prompt` (`review.py`): one stateless
+`ctx.llm.complete` call through the `prompt_refinement` slot, returning the
+original and the revision as text. It is a slash command, so nothing reaches
+the agent. It uses the Desktop half's own refinement instructions and intent
+rules: `dev/build.mjs` evaluates `dev/src/prompt.ts` and `dev/src/intent.ts` and
+writes them to `shared.json`. `checks.py` ports `preservation.ts` line for line
+and runs the exported intent rules; `dev/test/python/test_parity.py` holds it to
+the TypeScript checker's verdicts on `dev/test/parity/inputs.json`.
+
+With `plugins.entries.prompt-refinement.settings.agent_tool: true`, it also
+registers the `refine_prompt` tool and the `prompt-refinement:refine-prompt`
+skill. Both tell the agent to show the review and stop. That is a model
+instruction, not an enforced boundary, which is why the tool is off by default.
+
+## Layout
+
+- Repository root: only what `hermes plugins install` needs (the Python half,
+  `desktop/plugin.js`, `shared.json`, `skills/`). There is no root
+  `package.json`, so installing never offers to install Node dependencies.
+- `dev/`: sources (`dev/src`), tests (`dev/test`), the build and the scripts.
+
 ## Tests
 
-- `npm test`: the pure-logic suites and the SDK guard, standalone.
+From `dev/`:
+
+- `npm test`: the Desktop half's pure-logic suites and the SDK guard, standalone.
+- `pytest`: the fallback (`/refine-prompt`, tool, skill) and the parity test, standalone.
 - `scripts/test-in-hermes.sh <hermes-checkout> unit`: the full plugin suite
   (UI and real-composer integration), the Desktop typecheck against the real
-  SDK, and the Python half's test.
+  SDK, and the Python half loaded by Hermes.
 - `scripts/test-in-hermes.sh <hermes-checkout> e2e`: Playwright against the
   real app and gateway with a mock model, the plugin installed as a package.
 - `scripts/test-in-hermes.sh <hermes-checkout> older`: on a Desktop without the
-  review SDK, the plugin stays inactive and sends go through untouched.
+  review SDK, the Desktop half stays inactive and sends go through untouched.

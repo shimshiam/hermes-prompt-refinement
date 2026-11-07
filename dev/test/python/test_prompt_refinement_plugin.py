@@ -73,3 +73,69 @@ def test_pin_is_per_profile_and_is_what_the_refinement_call_resolves(homes):
         assert _get_auxiliary_task_config(TASK).get("model") == "vendor/refiner"
     assert TASK in (home_a / "config.yaml").read_text()
     assert TASK not in (home_b / "config.yaml").read_text()
+
+
+# ── the stock-Hermes fallback, loaded by Hermes itself ─────────────────────
+
+
+def _fake_provider(monkeypatch, content):
+    """Replace only the provider call under ctx.llm: Hermes's own trust gate and routing still run."""
+    import agent.auxiliary_client as aux
+    from types import SimpleNamespace
+
+    calls = []
+
+    def call_llm(**kwargs):
+        calls.append(kwargs)
+        message = SimpleNamespace(content=content, reasoning=None, reasoning_content=None, tool_calls=None)
+        choice = SimpleNamespace(message=message, finish_reason="stop", index=0)
+        return SimpleNamespace(choices=[choice], usage=None, model="fake-model")
+
+    monkeypatch.setattr(aux, "call_llm", call_llm)
+    return calls
+
+
+def test_enabled_plugin_registers_refine_prompt_and_no_tool_by_default(homes):
+    from hermes_cli.plugins import get_plugin_commands, get_plugin_manager
+
+    assert "refine-prompt" in get_plugin_commands()
+    manager = get_plugin_manager()
+    assert "refine_prompt" not in manager._plugin_tool_names
+    assert "prompt-refinement:refine-prompt" not in manager._plugin_skills
+
+
+def test_refine_prompt_answers_through_the_plugin_slot_and_never_reaches_the_agent(homes, monkeypatch):
+    from hermes_cli.plugins import get_plugin_command_handler
+
+    calls = _fake_provider(monkeypatch, json.dumps({"prompt": "Fix the flaky test in src/upload.test.ts."}))
+    out = get_plugin_command_handler("refine-prompt")("fix the flaky test in src/upload.test.ts")
+
+    assert "nothing was sent to the agent" in out
+    assert "Fix the flaky test in src/upload.test.ts." in out
+    assert len(calls) == 1 and calls[0]["task"] == TASK
+    assert calls[0]["messages"][0]["role"] == "system"
+
+
+def test_agent_tool_setting_registers_the_tool_and_the_skill(tmp_path, monkeypatch):
+    home = tmp_path / ".hermes"
+    home.mkdir(parents=True)
+    (home / "config.yaml").write_text(json.dumps({
+        "plugins": {
+            "enabled": ["prompt-refinement"],
+            "entries": {"prompt-refinement": {"settings": {"agent_tool": True}}},
+        }
+    }))
+    monkeypatch.setattr(Path, "home", lambda: tmp_path)
+    monkeypatch.setenv("HERMES_HOME", str(home))
+    monkeypatch.delenv("HERMES_BUNDLED_PLUGINS", raising=False)
+    monkeypatch.setattr(PluginManager, "_scan_entry_points", lambda self: [])
+    plugins_mod._reset_plugin_managers_for_tests()
+    try:
+        from hermes_cli.plugins import get_plugin_manager, _ensure_plugins_discovered
+
+        _ensure_plugins_discovered()
+        manager = get_plugin_manager()
+        assert "refine_prompt" in manager._plugin_tool_names
+        assert "prompt-refinement:refine-prompt" in manager._plugin_skills
+    finally:
+        plugins_mod._reset_plugin_managers_for_tests()

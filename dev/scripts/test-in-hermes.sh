@@ -1,11 +1,12 @@
 #!/bin/bash
 # Run the tests that need a real Hermes checkout, then restore it exactly.
 #
-#   scripts/test-in-hermes.sh <hermes-checkout> unit    plugin vitest (UI + real composer), Desktop
+#   dev/scripts/test-in-hermes.sh <hermes-checkout> unit    plugin vitest (UI + real composer), Desktop
 #                                                       typecheck against the real SDK, Python half test
-#   scripts/test-in-hermes.sh <hermes-checkout> e2e     the full e2e (Off, Approval-First, Automatic)
+#                                                       (slot, /refine-prompt, opt-in tool and skill)
+#   dev/scripts/test-in-hermes.sh <hermes-checkout> e2e     the full e2e (Off, Approval-First, Automatic)
 #                                                       with this repo installed as a Git package
-#   scripts/test-in-hermes.sh <hermes-checkout> older   on a Desktop WITHOUT the review SDK: the plugin
+#   dev/scripts/test-in-hermes.sh <hermes-checkout> older   on a Desktop WITHOUT the review SDK: the plugin
 #                                                       stays inactive and sends go through untouched
 #
 # The checkout must be clean, have its toolchain on PATH (pnpm, uv; see its
@@ -15,7 +16,8 @@
 # removed on exit.
 set -u
 
-REPO="$(cd "$(dirname "$0")/.." && pwd)"
+REPO="$(cd "$(dirname "$0")/../.." && pwd)"  # the repository root (the installable plugin)
+DEV="$REPO/dev"
 HERMES="$(cd "${1:?usage: test-in-hermes.sh <hermes-checkout> unit|e2e|older}" && pwd)"
 MODE="${2:-unit}"
 DESKTOP="$HERMES/apps/desktop"
@@ -24,6 +26,8 @@ TREE_PY="$HERMES/plugins/prompt-refinement"
 TREE_PY_TEST="$HERMES/tests/plugins/test_prompt_refinement_plugin.py"
 SPEC_DIR="$DESKTOP/e2e"
 STAGE=""
+# The Python half: what `hermes plugins install` needs besides desktop/.
+PY_HALF=(plugin.yaml __init__.py review.py checks.py shared.json skills)
 
 if [ -n "$(git -C "$HERMES" status --porcelain)" ]; then
   echo "test-in-hermes: $HERMES has uncommitted changes; refusing" >&2
@@ -52,7 +56,7 @@ trap restore EXIT
 stage_package() {
   STAGE="$(mktemp -d)"
   mkdir -p "$STAGE/package/desktop"
-  cp "$REPO/plugin.yaml" "$REPO/__init__.py" "$STAGE/package/"
+  for item in "${PY_HALF[@]}"; do cp -R "$REPO/$item" "$STAGE/package/"; done
   cp "$REPO/desktop/plugin.js" "$STAGE/package/desktop/"
   export PROMPT_REFINEMENT_PACKAGE="$STAGE/package"
 }
@@ -73,10 +77,10 @@ EOF
 
 case "$MODE" in
   unit)
-    cp -R "$REPO/src" "$TREE_PLUGIN"
+    cp -R "$DEV/src" "$TREE_PLUGIN"
     mkdir -p "$TREE_PY"
-    cp "$REPO/plugin.yaml" "$REPO/__init__.py" "$TREE_PY/"
-    cp "$REPO/test/python/test_prompt_refinement_plugin.py" "$TREE_PY_TEST"
+    for item in "${PY_HALF[@]}"; do cp -R "$REPO/$item" "$TREE_PY/"; done
+    cp "$DEV/test/python/test_prompt_refinement_plugin.py" "$TREE_PY_TEST"
     status=0
     (cd "$DESKTOP" && pnpm exec vitest run --project ui src/plugins/prompt-refinement) || status=1
     (cd "$DESKTOP" && NODE_OPTIONS=--max-old-space-size=4096 pnpm run typecheck) || status=1
@@ -86,8 +90,8 @@ case "$MODE" in
   e2e | older)
     stage_package
     patch_fixtures
-    spec="$REPO/test/e2e/prompt-refinement.spec.ts"
-    [ "$MODE" = older ] && spec="$REPO/test/e2e/older-desktop.spec.ts"
+    spec="$DEV/test/e2e/prompt-refinement.spec.ts"
+    [ "$MODE" = older ] && spec="$DEV/test/e2e/older-desktop.spec.ts"
     cp "$spec" "$SPEC_DIR/prompt-refinement-package.spec.ts"
     cd "$DESKTOP" && pnpm exec playwright test e2e/prompt-refinement-package.spec.ts --workers=1 --reporter=list
     ;;

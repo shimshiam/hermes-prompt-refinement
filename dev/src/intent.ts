@@ -9,7 +9,7 @@
  *   install       installs, new dependencies, upgrades
  *   external      email, messages, publishing, uploads, pushes, deploys
  *   spending      purchases, payments, subscriptions, money amounts
- *   permission    sudo, chmod, credentials, keys, disabling security
+ *   permission    admin rights, file modes, credentials, keys, disabled security
  *   delegation    subagents, swarms, delegation: added, dropped or flipped
  *   from-context  a run of words copied from the chat excerpt, not the draft
  *
@@ -44,7 +44,7 @@ export interface IntentIssue {
   value: string
 }
 
-interface Rule {
+export interface Rule {
   kind: Exclude<IntentKind, 'from-context'>
   /** What, in the rewrite, asks for this kind of action. */
   trigger: RegExp
@@ -56,7 +56,8 @@ interface Rule {
 
 const words = (alternatives: string[]) => alternatives.join('|')
 
-const RULES: readonly Rule[] = [
+/** Exported for the /refine-prompt fallback (dev/build.mjs writes them to shared.json). */
+export const RULES: readonly Rule[] = [
   {
     kind: 'destructive',
     trigger: new RegExp(
@@ -247,18 +248,18 @@ const RULES: readonly Rule[] = [
 
 /** A word in the same clause before the match that turns it into a
  *  prohibition or a precondition ("do not delete", "ask before deleting"). */
-const NEGATED_BEFORE =
+export const NEGATED_BEFORE =
   /\b(?:not|no|never|without|avoid(?:ing)?|nor|cannot|instead of|rather than|refrain from|(?:ask|confirm|check)\w*(?: \w+){0,3} (?:before|prior to))\b|n['’]t\b/i
 
 /** Where a clause ends, so a negation in an earlier clause does not cover a
  *  later instruction ("don't touch the tests, but delete the fixtures"). */
-const CLAUSE_BREAK = /[.;!?\n]|\bbut\b|\bthen\b|\bhowever\b/gi
+export const CLAUSE_BREAK = /[.;!?\n]|\bbut\b|\bthen\b|\bhowever\b/gi
 
 /** A quantity right after the verb that cancels it ("install no new
  *  dependencies", "change nothing"). */
-const NEGATED_AFTER = /^\s+(?:no|nothing|none|zero)\b/i
+export const NEGATED_AFTER = /^\s+(?:no|nothing|none|zero)\b/i
 
-const NEGATION_LOOKBACK = 60
+export const NEGATION_LOOKBACK = 60
 
 function isNegated(text: string, index: number, length: number): boolean {
   const before = text.slice(Math.max(0, index - NEGATION_LOOKBACK), index)

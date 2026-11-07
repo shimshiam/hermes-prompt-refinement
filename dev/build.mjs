@@ -1,5 +1,8 @@
-// Build the Desktop half: src/plugin.tsx -> desktop/plugin.js, one ESM file
-// that Hermes Desktop loads uncompiled from disk.
+// Build what the plugin installs from dev/ sources, into the repository root:
+//   desktop/plugin.js   the Desktop half (dev/src/plugin.tsx), one ESM file
+//                       Hermes Desktop loads uncompiled from disk
+//   shared.json         what the /refine-prompt fallback shares with it
+// and dev/test/parity/expected.json (the TypeScript checks' verdicts).
 //
 // Desktop lets a disk plugin import only `@hermes/plugin-sdk`, `react` and
 // `react/jsx-runtime`, and its SDK shim exports only the names the running
@@ -8,23 +11,26 @@
 // `undefined` (src/sdk-support.ts then keeps the plugin inactive) instead of
 // a module-link error that stops the plugin from loading at all.
 //
-//   node build.mjs                 write desktop/plugin.js
-//   node build.mjs <outfile>       write elsewhere (used by the CI check)
+//   node build.mjs           write into the repository
+//   node build.mjs <dir>     write the same files under <dir> (the CI check)
 
 import { build } from 'esbuild'
 import fs from 'node:fs'
+import os from 'node:os'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
-const root = path.dirname(fileURLToPath(import.meta.url))
-const outfile = path.resolve(process.argv[2] ?? path.join(root, 'desktop/plugin.js'))
+const dev = path.dirname(fileURLToPath(import.meta.url))
+const repo = path.resolve(dev, '..')
+const out = path.resolve(process.argv[2] ?? repo)
+const outfile = path.join(out, 'desktop/plugin.js')
 const SDK = '@hermes/plugin-sdk'
 
 /** Every value name the source imports from the SDK (type-only imports are skipped). */
 function sdkNames() {
   // atom and computed: scripts/nanostores-from-sdk.js re-exports them.
   const names = new Set(['atom', 'computed'])
-  const src = path.join(root, 'src')
+  const src = path.join(dev, 'src')
 
   for (const file of fs.readdirSync(src)) {
     if (!/\.tsx?$/.test(file) || /\.test\.tsx?$/.test(file)) {
@@ -69,7 +75,7 @@ const sdkCompat = {
 }
 
 await build({
-  entryPoints: [path.join(root, 'src/plugin.tsx')],
+  entryPoints: [path.join(dev, 'src/plugin.tsx')],
   outfile,
   bundle: true,
   format: 'esm',
@@ -79,10 +85,36 @@ await build({
   legalComments: 'none',
   external: ['react', 'react/jsx-runtime'],
   // The SDK re-exports nanostores' `atom`; a disk plugin cannot import nanostores itself.
-  alias: { nanostores: path.join(root, 'scripts/nanostores-from-sdk.js') },
+  alias: { nanostores: path.join(dev, 'scripts/nanostores-from-sdk.js') },
   plugins: [sdkCompat],
-  banner: { js: '// Prompt Refinement for Hermes Desktop. Built from src/ by build.mjs; do not edit.' },
+  banner: { js: '// Prompt Refinement for Hermes Desktop. Built from dev/src/ by dev/build.mjs; do not edit.' },
   logLevel: 'warning'
 })
 
-console.log(`built ${path.relative(root, outfile)}`)
+console.log(`built ${path.relative(repo, outfile)}`)
+
+// The stock-Hermes fallback (Python) shares the refinement instructions and the
+// intent rules with the Desktop half, and must reach the same check verdicts.
+const entryOut = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'prompt-refinement-shared-')), 'shared.mjs')
+
+await build({
+  entryPoints: [path.join(dev, 'scripts/shared-entry.ts')],
+  outfile: entryOut,
+  bundle: true,
+  format: 'esm',
+  platform: 'node',
+  target: 'node20',
+  logLevel: 'warning'
+})
+
+const { parity, shared } = await import(pathToFileURL(entryOut).href)
+const inputs = JSON.parse(fs.readFileSync(path.join(dev, 'test/parity/inputs.json'), 'utf8'))
+const writeJson = (file, value) => {
+  fs.mkdirSync(path.dirname(file), { recursive: true })
+  fs.writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`)
+}
+
+writeJson(path.join(out, 'shared.json'), shared())
+writeJson(path.join(out, 'dev/test/parity/expected.json'), parity(inputs))
+fs.rmSync(path.dirname(entryOut), { recursive: true, force: true })
+console.log('built shared.json, dev/test/parity/expected.json')

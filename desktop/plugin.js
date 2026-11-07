@@ -1,4 +1,4 @@
-// Prompt Refinement for Hermes Desktop. Built from src/ by build.mjs; do not edit.
+// Prompt Refinement for Hermes Desktop. Built from dev/src/ by dev/build.mjs; do not edit.
 var __defProp = Object.defineProperty;
 var __export = (target, all) => {
   for (var name in all)
