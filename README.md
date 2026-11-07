@@ -12,7 +12,10 @@ When you press Enter, a side model rewrites your draft into a stronger version o
 
 Slash commands, queued, voice and hidden sends, and very short prompts are always sent as typed. The **Refine** pill beside the model picker switches mode, depth (Auto, Polish, Clarify, Deepen) and style in one click.
 
-> **Status: preview.** Prompt Refinement needs the *composer review* additions to the Hermes Desktop plugin SDK, proposed upstream in SDK-PR-LINK. Until a Hermes release includes them, the plugin installs but stays inactive, and its settings page says what's missing. To try it now, see [Try it before release](#try-it-before-release).
+> **Status: preview.** Prompt Refinement needs the *composer review* additions to the Hermes Desktop plugin SDK, proposed upstream in [NousResearch/hermes-agent#150772](https://github.com/NousResearch/hermes-agent/pull/150772).
+>
+> - **With that SDK branch, today:** the full plugin works: Off, Approval-First and Automatic. See [Try it before release](#try-it-before-release).
+> - **On stock Hermes, until a release includes those additions:** it installs but stays inactive. It registers nothing that touches your sends, and its settings page says what's missing.
 
 ## Install
 
